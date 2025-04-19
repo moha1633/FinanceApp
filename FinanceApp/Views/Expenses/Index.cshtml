@@ -1,0 +1,95 @@
+﻿@model IEnumerable<FinanceApp.Models.Expense>
+@using System.Text.Json
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">📋 Mina utgifter</h2>
+
+    <!-- Förbättrad styling på tabellen -->
+    <table class="table table-striped table-hover border shadow-sm">
+        <thead class="table-dark text-center">
+            <tr>
+                <th class="align-middle">Beskrivning</th>
+                <th class="align-middle">Belopp</th>
+                <th class="align-middle">Kategori</th>
+                <th class="align-middle">Datum</th>
+                <th class="align-middle">Åtgärd</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Description</td>
+                    <td>@item.Amount.ToString("C", new System.Globalization.CultureInfo("sv-SE"))</td>
+                    <td>@item.Category</td>
+                    <td>@item.Date.ToString("yyyy-MM-dd")</td>
+                    <td class="text-center">
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm me-2">Redigera</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">🗑️ Radera</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-center mt-3">
+        <a asp-action="Create" class="btn btn-primary">➕ Lägg till ny utgift</a>
+    </div>
+</div>
+
+<hr class="my-5" />
+
+<div class="container mb-5 text-center">
+    <h3 class="mb-3">🍰 Utgifter per kategori</h3>
+
+    <!-- Förbättrad stil på diagrammet -->
+    <div style="width: 300px; height: 300px; margin: auto;">
+        <canvas id="myPieChart" width="300" height="300"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const pieCtx = document.getElementById('myPieChart');
+
+    const categories = @Html.Raw(JsonSerializer.Serialize(Model.Select(e => e.Category).Distinct()));
+    const amountsPerCategory = @Html.Raw(JsonSerializer.Serialize(
+        Model.GroupBy(e => e.Category).Select(g => g.Sum(e => e.Amount))
+    ));
+
+    new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: categories,
+            datasets: [{
+                label: 'Belopp per kategori (kr)',
+                data: amountsPerCategory,
+                backgroundColor: [
+                    '#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f', '#edc948',
+                    '#b07aa1', '#ff9da7', '#9c755f', '#bab0ac' // Fler färger om du har många kategorier
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            let value = context.parsed;
+                            return `${label}: ${value.toLocaleString('sv-SE', {
+                                style: 'currency',
+                                currency: 'SEK'
+                            })}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>

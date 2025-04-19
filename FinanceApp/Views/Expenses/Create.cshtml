@@ -1,0 +1,43 @@
+﻿@model FinanceApp.Models.Expense
+
+<div class="container mt-5">
+    <h2 class="mb-4">➕ Lägg till utgift</h2>
+
+    <form asp-action="Create" method="post" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label"></label>
+            <input asp-for="Description" class="form-control" placeholder="T.ex. Hyra, Mat, Transport" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Amount" class="form-label"></label>
+            <div class="input-group">
+                <input asp-for="Amount" class="form-control" step="0.01" placeholder="" />
+                <span class="input-group-text">kr</span>
+            </div>
+            <span asp-validation-for="Amount" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Category" class="form-label"></label>
+            <input asp-for="Category" class="form-control" placeholder="T.ex. Boende, Mat, Fritid" />
+            <span asp-validation-for="Category" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Date" class="form-label"></label>
+            <input asp-for="Date" class="form-control" type="date" />
+            <span asp-validation-for="Date" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-success">💾 Spara</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">↩️ Tillbaka</a>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
